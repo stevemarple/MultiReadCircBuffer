@@ -1,0 +1,99 @@
+--------------- File: mrcb_test.cpp:121
+Capacity:        256
+Allow overwrite: 1
+Num readers:     3
+#0 size: 0, ptr: 0
+#1 size: 0, ptr: 0
+#2 size: 0, ptr: 0
+write ptr: 0
+Wrote 96 of 100 bytes
+--------------- File: mrcb_test.cpp:127
+Capacity:        256
+Allow overwrite: 1
+Num readers:     3
+#0 size: 96, ptr: 0
+#1 size: 96, ptr: 0
+#2 size: 96, ptr: 0
+write ptr: 96
+#0 read 96 of 200 bytes, "I was born in the year 1632, in the city of York, of a good family,
+though not of that country, "
+#1 read 96 of 100 bytes, "I was born in the year 1632, in the city of York, of a good family,
+though not of that country, "
+#2 read 80 of 80 bytes, "I was born in the year 1632, in the city of York, of a good family,
+though not o"
+--------------- File: mrcb_test.cpp:132
+Capacity:        256
+Allow overwrite: 1
+Num readers:     3
+#0 size: 0, ptr: 96
+#1 size: 0, ptr: 96
+#2 size: 16, ptr: 80
+write ptr: 96
+#0 read 0 of 200 bytes, ""
+#1 read 0 of 100 bytes, ""
+#2 read 16 of 80 bytes, "f that country, "
+--------------- File: mrcb_test.cpp:137
+Capacity:        256
+Allow overwrite: 1
+Num readers:     3
+#0 size: 0, ptr: 96
+#1 size: 0, ptr: 96
+#2 size: 0, ptr: 96
+write ptr: 96
+Wrote 256 of 300 bytes
+--------------- File: mrcb_test.cpp:140
+Capacity:        256
+Allow overwrite: 1
+Num readers:     3
+#0 size: 256, ptr: 96
+#1 size: 256, ptr: 96
+#2 size: 256, ptr: 96
+write ptr: 96
+#0 read 192 of 200 bytes, "ettled first at Hull.  He got a good estate by merchandise, and leaving
+off his trade, lived afterwards at York, from whence he had married my
+mother, whose relations were named Robinson, a ve"
+#1 read 96 of 100 bytes, "ettled first at Hull.  He got a good estate by merchandise, and leaving
+off his trade, lived aft"
+#2 read 80 of 80 bytes, "ettled first at Hull.  He got a good estate by merchandise, and leaving
+off his "
+--------------- File: mrcb_test.cpp:145
+Capacity:        256
+Allow overwrite: 1
+Num readers:     3
+#0 size: 64, ptr: 32
+#1 size: 160, ptr: 192
+#2 size: 176, ptr: 176
+write ptr: 96
+Wrote 96 of 100 bytes
+--------------- File: mrcb_test.cpp:148
+Capacity:        256
+Allow overwrite: 1
+Num readers:     3
+#0 size: 160, ptr: 32
+#1 size: 256, ptr: 192
+#2 size: 256, ptr: 192
+write ptr: 192
+#0 read 160 of 300 bytes, "ry good family in that
+country, and from whom I was called Robinat
+country, and from whom I was called Robinson Kreutznaer; but, by the
+usual corruption of word"
+#1 read 256 of 300 bytes, "erwards at York, from whence he had married my
+mother, whose relations were named Robinson, a very good family in that
+country, and from whom I was called Robinat
+country, and from whom I was called Robinson Kreutznaer; but, by the
+usual corruption of word"
+#2 read 256 of 300 bytes, "erwards at York, from whence he had married my
+mother, whose relations were named Robinson, a very good family in that
+country, and from whom I was called Robinat
+country, and from whom I was called Robinson Kreutznaer; but, by the
+usual corruption of word"
+--------------- File: mrcb_test.cpp:152
+Capacity:        256
+Allow overwrite: 1
+Num readers:     3
+#0 size: 0, ptr: 192
+#1 size: 0, ptr: 192
+#2 size: 0, ptr: 192
+write ptr: 192
+p: 448
+done
