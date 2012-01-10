@@ -1,23 +1,27 @@
 #ifndef MULTIREADCIRCBUFFER_H
 #define MULTIREADCIRCBUFFER_H
 
-#ifdef DEBUG
+#include <Arduino.h>
+
+// Allow debugging/regression testing under normal g++ environment.
+#ifdef MRCB_DEBUG
 #include <iostream>
 using namespace std;
 #endif
 
 class MultiReadCircBuffer {
 public:
-  MultiReadCircBuffer(void* myBuffer, int myBufferLen, bool myAllowOverwrite);
-  MultiReadCircBuffer(void* myBuffer, int myBufferLen,
-		 bool myAllowOverwrite, uint8_t myNumReaders,
-		 int* mySizes, uint8_t** myReadPtrs);
+  MultiReadCircBuffer(void* myBuffer, int myBufferLen, bool myAllowOverwrite, int myBlockSize = 0);
+  MultiReadCircBuffer(void* myBuffer, int myBufferLen, 
+		      bool myAllowOverwrite, int myBlockSize, uint8_t myNumReaders,
+		      int* mySizes, uint8_t** myReadPtrs);
 
   inline bool getAllowOverwrite(void) const;
   inline int getCapacity(void) const;
   inline int getNumReaders(void) const;
   inline int getSize(uint8_t reader = 0) const;
-
+  inline int getBlockSize(void) const;
+  
   // @return number of bytes written
   int write(const uint8_t* src, int srcLen);
   int write(const uint8_t* src, int srcLen, bool& dataOverWritten);
@@ -28,7 +32,7 @@ public:
   int read(uint8_t* dest, int destLen, uint8_t reader = 0);
   inline int read(void* dest, int destLen, uint8_t reader = 0);
 
-#ifdef DEBUG
+#ifdef MRCB_DEBUG
   inline void status(const char *file = NULL, int line = 0) const;
 #endif
   
@@ -36,6 +40,7 @@ private:
   uint8_t* buffer;
   int bufferLen;
   bool allowOverwrite;
+  int blockSize;
   uint8_t* volatile writePtr;
   uint8_t numReaders;
   int* volatile sizes;
@@ -78,6 +83,13 @@ inline int MultiReadCircBuffer::getSize(uint8_t reader) const
 }
 
 
+inline int MultiReadCircBuffer::getBlockSize(void) const
+{
+  if (blockSize > 1)
+    return blockSize;
+  return 1;
+}
+
 inline const uint8_t* MultiReadCircBuffer::getEndOfBuffer(void) const
 {
   return buffer + bufferLen;
@@ -108,7 +120,7 @@ inline int MultiReadCircBuffer::read(void* dest, int destLen, uint8_t reader)
 }
 
 
-#ifdef DEBUG
+#ifdef MRCB_DEBUG
 inline void MultiReadCircBuffer::status(const char *file, int line) const
 {
   cout << "--------------- ";

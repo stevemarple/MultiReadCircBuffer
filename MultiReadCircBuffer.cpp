@@ -4,10 +4,8 @@
 
 #define interruptsEnabled() ((SREG & 0x80) >> 7)
 
-// Need a per-reader size value
-
 MultiReadCircBuffer::MultiReadCircBuffer(void* myBuffer, int myBufferLen,
-			       bool myAllowOverwrite)
+					 bool myAllowOverwrite, int myBlockSize)
 {
   buffer = (uint8_t*)myBuffer;
   bufferLen = myBufferLen;
@@ -18,12 +16,16 @@ MultiReadCircBuffer::MultiReadCircBuffer(void* myBuffer, int myBufferLen,
   sizes = &size0;
   sizes[0] = 0;
   allowOverwrite = myAllowOverwrite;
+  if (myBlockSize > 1)
+    blockSize = myBlockSize;
+  else
+    blockSize = 0;
 }
 
 
 MultiReadCircBuffer::MultiReadCircBuffer(void* myBuffer, int myBufferLen,
-			       bool myAllowOverwrite, uint8_t myNumReaders,
-			       int* mySizes, uint8_t** myReadPtrs)
+					 bool myAllowOverwrite, int myBlockSize,
+					 uint8_t myNumReaders, int* mySizes, uint8_t** myReadPtrs)
 {
   buffer = (uint8_t*)myBuffer;
   bufferLen = myBufferLen;
@@ -36,6 +38,10 @@ MultiReadCircBuffer::MultiReadCircBuffer(void* myBuffer, int myBufferLen,
     sizes[i] = 0;
   }
   allowOverwrite = myAllowOverwrite;
+  if (myBlockSize > 1)
+    blockSize = myBlockSize;
+  else
+    blockSize = 0;
 }
 
 
@@ -51,6 +57,9 @@ int MultiReadCircBuffer::write(const uint8_t* src, int srcLen,
 {
   boolean intEn = interruptsEnabled();
   int len = srcLen;
+
+  if (blockSize)
+    len -= (len % blockSize); // Round down len to a multiple of the blockSize
   
   // Assume overwritten is false (always the case when allowOverwrite
   // is false)
@@ -116,6 +125,9 @@ int MultiReadCircBuffer::write(const uint8_t* src, int srcLen,
 
 int MultiReadCircBuffer::read(uint8_t* dest, int destLen, uint8_t reader)
 {
+  if (blockSize)
+    destLen -= (destLen % blockSize); // Round down destLen to a multiple of the blockSize
+
   // If allowOverwrite == false then only call to getSize() must run
   // with interrupts turned off. Otherwise whole function must run
   // with interrupts turned off.
