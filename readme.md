@@ -13,6 +13,11 @@ data should be overwritten or not if it is inserted faster than the
 slowest reader is removing it. Any buffer size between 1 and max int -1
 is valid.
 
+## Current status
+
+Compiles under Arduino IDE. Behaviour (excluding enable/disable interrupt code) tested under g++.
+Regression testing under g++.
+
 
 
 
