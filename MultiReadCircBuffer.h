@@ -11,12 +11,16 @@ using namespace std;
 
 class MultiReadCircBuffer {
 public:
-  MultiReadCircBuffer(void* myBuffer, int myBufferLen, bool myAllowOverwrite, int myBlockSize = 0);
-  MultiReadCircBuffer(void* myBuffer, int myBufferLen, 
-		      bool myAllowOverwrite, int myBlockSize, uint8_t myNumReaders,
-		      int* mySizes, uint8_t** myReadPtrs);
+  MultiReadCircBuffer(void* myBuffer, int myBufferLen, bool myAllowOverwrite,
+		      bool myUseInterrupts, int myBlockSize = 0);
+  MultiReadCircBuffer(void* myBuffer, int myBufferLen, bool myAllowOverwrite,
+		      bool myUseInterrupts, int myBlockSize,
+		      uint8_t myNumReaders, int* mySizes,
+		      uint8_t** myReadPtrs);
 
+  static inline bool interruptsEnabled(void);
   inline bool getAllowOverwrite(void) const;
+  inline bool getUseInterrupts(void) const;
   inline int getCapacity(void) const;
   inline int getNumReaders(void) const;
   inline int getSize(uint8_t reader = 0) const;
@@ -40,6 +44,7 @@ private:
   uint8_t* buffer;
   int bufferLen;
   bool allowOverwrite;
+  bool useInterrupts;
   int blockSize;
   uint8_t* volatile writePtr;
   uint8_t numReaders;
@@ -57,9 +62,20 @@ private:
   const MultiReadCircBuffer& operator=(MultiReadCircBuffer const &a);
 };
 
+inline bool MultiReadCircBuffer::interruptsEnabled(void)
+{
+  return ((SREG & 0x80) >> 7);
+}
+
 inline bool MultiReadCircBuffer::getAllowOverwrite(void) const
 {
   return allowOverwrite;
+}
+
+
+inline bool MultiReadCircBuffer::getUseInterrupts(void) const
+{
+  return useInterrupts; 
 }
 
 
@@ -90,6 +106,7 @@ inline int MultiReadCircBuffer::getBlockSize(void) const
   return 1;
 }
 
+
 inline const uint8_t* MultiReadCircBuffer::getEndOfBuffer(void) const
 {
   return buffer + bufferLen;
@@ -118,7 +135,6 @@ inline int MultiReadCircBuffer::read(void* dest, int destLen, uint8_t reader)
 {
   return read((uint8_t*)dest, destLen, reader);
 }
-
 
 #ifdef MRCB_DEBUG
 inline void MultiReadCircBuffer::status(const char *file, int line) const

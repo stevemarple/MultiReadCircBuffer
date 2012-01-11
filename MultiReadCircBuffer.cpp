@@ -1,11 +1,9 @@
 #include <MultiReadCircBuffer.h>
 #include <string.h>
 
-
-#define interruptsEnabled() ((SREG & 0x80) >> 7)
-
 MultiReadCircBuffer::MultiReadCircBuffer(void* myBuffer, int myBufferLen,
-					 bool myAllowOverwrite, int myBlockSize)
+					 bool myAllowOverwrite,
+					 bool myUseInterrupts, int myBlockSize)
 {
   buffer = (uint8_t*)myBuffer;
   bufferLen = myBufferLen;
@@ -16,6 +14,7 @@ MultiReadCircBuffer::MultiReadCircBuffer(void* myBuffer, int myBufferLen,
   sizes = &size0;
   sizes[0] = 0;
   allowOverwrite = myAllowOverwrite;
+  useInterrupts = myUseInterrupts;
   if (myBlockSize > 1)
     blockSize = myBlockSize;
   else
@@ -24,8 +23,10 @@ MultiReadCircBuffer::MultiReadCircBuffer(void* myBuffer, int myBufferLen,
 
 
 MultiReadCircBuffer::MultiReadCircBuffer(void* myBuffer, int myBufferLen,
-					 bool myAllowOverwrite, int myBlockSize,
-					 uint8_t myNumReaders, int* mySizes, uint8_t** myReadPtrs)
+					 bool myAllowOverwrite,
+					 bool myUseInterrupts, int myBlockSize,
+					 uint8_t myNumReaders, int* mySizes,
+					 uint8_t** myReadPtrs)
 {
   buffer = (uint8_t*)myBuffer;
   bufferLen = myBufferLen;
@@ -38,6 +39,7 @@ MultiReadCircBuffer::MultiReadCircBuffer(void* myBuffer, int myBufferLen,
     sizes[i] = 0;
   }
   allowOverwrite = myAllowOverwrite;
+  useInterrupts = myUseInterrupts;
   if (myBlockSize > 1)
     blockSize = myBlockSize;
   else
@@ -73,19 +75,21 @@ int MultiReadCircBuffer::write(const uint8_t* src, int srcLen,
       len = bufferLen;
       src += (srcLen - len);
     }
-    noInterrupts();
+    if (useInterrupts)
+      noInterrupts();
   }
   else {
     // Reduce len to smallest size that can be written without
     // overwriting any data. This section must run with interrupts
     // off.
-    noInterrupts();
+    if (useInterrupts)
+      noInterrupts();
     for (int i = 0; i < numReaders; ++i) {
       int n = bufferLen - getSize(i);
       if (n < len)
 	len = n;
     }
-    if (intEn)
+    if (useInterrupts && intEn)
       interrupts();
   }
   
@@ -106,18 +110,17 @@ int MultiReadCircBuffer::write(const uint8_t* src, int srcLen,
   }
 
   // Update sizes and readPtrs
-  noInterrupts(); // no interrupts even for allowOverwrite == false
-  //if (allowOverwrite) {
+  if (useInterrupts)
+    noInterrupts(); // no interrupts even for allowOverwrite == false
   for (int i = 0; i < numReaders; ++i)
     if ((sizes[i] += len) > bufferLen) {
       overwritten = true;
       readPtrs[i] = writePtr;
       sizes[i] = bufferLen;
     }
-  //}
   
   // Restore interrupt status
-  if (intEn)
+  if (useInterrupts && intEn)
     interrupts();
   return len;
 }
@@ -132,10 +135,11 @@ int MultiReadCircBuffer::read(uint8_t* dest, int destLen, uint8_t reader)
   // with interrupts turned off. Otherwise whole function must run
   // with interrupts turned off.
   boolean intEn = interruptsEnabled();
-  noInterrupts();
+  if (useInterrupts)
+    noInterrupts();
   int size = getSize(reader); 
 
-  if (allowOverwrite == false && intEn)
+  if (useInterrupts && allowOverwrite == false && intEn)
     interrupts();
   
   if (destLen > size)
@@ -158,10 +162,11 @@ int MultiReadCircBuffer::read(uint8_t* dest, int destLen, uint8_t reader)
   }
 
   // Update sizes and readPtrs
-  noInterrupts();
+  if (useInterrupts)
+    noInterrupts();
   sizes[reader] -= destLen;
   
-  if (intEn)
+  if (useInterrupts && intEn)
     interrupts();
   return destLen;
 }

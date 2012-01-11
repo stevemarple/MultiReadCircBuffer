@@ -3,21 +3,32 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include <sys/types.h>
-//#include <sys/stat.h>
 #include <fcntl.h>
 
 #include <ctype.h>
 
 #include <string.h>
 
+#include <iostream> 
+using namespace std;
+
 typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;
 typedef unsigned long uint32_t;
 typedef bool boolean;
 
-#define interrupts() ;
-#define noInterrupts() ;
+inline void interrupts(void)
+{
+  // cout << "Interrupts on" << endl;
+  ;
+}
+
+inline void noInterrupts(void)
+{
+  // cout << "Interrupts off" << endl;
+  ;
+}
+
 #define SREG 0x80
 
 #endif

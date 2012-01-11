@@ -1,4 +1,4 @@
---------------- File: mrcb_test.cpp:121
+--------------- File: mrcb_test.cpp:61
 Capacity:        256
 Allow overwrite: 1
 Num readers:     3
@@ -7,7 +7,7 @@ Num readers:     3
 #2 size: 0, ptr: 0
 write ptr: 0
 Wrote 96 of 100 bytes
---------------- File: mrcb_test.cpp:127
+--------------- File: mrcb_test.cpp:66
 Capacity:        256
 Allow overwrite: 1
 Num readers:     3
@@ -21,7 +21,7 @@ though not of that country, "
 though not of that country, "
 #2 read 80 of 80 bytes, "I was born in the year 1632, in the city of York, of a good family,
 though not o"
---------------- File: mrcb_test.cpp:132
+--------------- File: mrcb_test.cpp:71
 Capacity:        256
 Allow overwrite: 1
 Num readers:     3
@@ -32,7 +32,7 @@ write ptr: 96
 #0 read 0 of 200 bytes, ""
 #1 read 0 of 100 bytes, ""
 #2 read 16 of 80 bytes, "f that country, "
---------------- File: mrcb_test.cpp:137
+--------------- File: mrcb_test.cpp:76
 Capacity:        256
 Allow overwrite: 1
 Num readers:     3
@@ -41,7 +41,7 @@ Num readers:     3
 #2 size: 0, ptr: 96
 write ptr: 96
 Wrote 256 of 300 bytes
---------------- File: mrcb_test.cpp:140
+--------------- File: mrcb_test.cpp:79
 Capacity:        256
 Allow overwrite: 1
 Num readers:     3
@@ -56,7 +56,7 @@ mother, whose relations were named Robinson, a ve"
 off his trade, lived aft"
 #2 read 80 of 80 bytes, "ettled first at Hull.  He got a good estate by merchandise, and leaving
 off his "
---------------- File: mrcb_test.cpp:145
+--------------- File: mrcb_test.cpp:84
 Capacity:        256
 Allow overwrite: 1
 Num readers:     3
@@ -65,7 +65,7 @@ Num readers:     3
 #2 size: 176, ptr: 176
 write ptr: 96
 Wrote 96 of 100 bytes
---------------- File: mrcb_test.cpp:148
+--------------- File: mrcb_test.cpp:87
 Capacity:        256
 Allow overwrite: 1
 Num readers:     3
@@ -87,7 +87,7 @@ mother, whose relations were named Robinson, a very good family in that
 country, and from whom I was called Robinat
 country, and from whom I was called Robinson Kreutznaer; but, by the
 usual corruption of word"
---------------- File: mrcb_test.cpp:152
+--------------- File: mrcb_test.cpp:91
 Capacity:        256
 Allow overwrite: 1
 Num readers:     3
