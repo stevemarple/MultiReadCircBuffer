@@ -15,7 +15,7 @@ is valid.
 
 ## Current status
 
-Compiles under Arduino IDE. Behaviour (excluding enable/disable interrupt code) tested under g++.
+Compiles under Arduino 1.0. Behaviour (excluding enable/disable interrupt code) tested under g++.
 Regression testing under g++.
 
 
