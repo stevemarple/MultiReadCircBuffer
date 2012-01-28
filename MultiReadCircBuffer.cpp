@@ -129,7 +129,8 @@ int MultiReadCircBuffer::write(const uint8_t* src, int srcLen,
 int MultiReadCircBuffer::read(uint8_t* dest, int destLen, uint8_t reader)
 {
   if (blockSize)
-    destLen -= (destLen % blockSize); // Round down destLen to a multiple of the blockSize
+    // Round down destLen to a multiple of the blockSize
+    destLen -= (destLen % blockSize); 
 
   // If allowOverwrite == false then only call to getSize() must run
   // with interrupts turned off. Otherwise whole function must run
@@ -158,6 +159,55 @@ int MultiReadCircBuffer::read(uint8_t* dest, int destLen, uint8_t reader)
   if (destLen > bbw) {
     int len2 = destLen - bbw;
     memcpy(dest + len1, readPtrs[reader], len2);
+    readPtrs[reader] += len2;
+  }
+
+  // Update sizes and readPtrs
+  if (useInterrupts)
+    noInterrupts();
+  sizes[reader] -= destLen;
+  
+  if (useInterrupts && intEn)
+    interrupts();
+  return destLen;
+}
+
+
+int MultiReadCircBuffer::read(Print& stream, int destLen, uint8_t reader)
+{
+  if (blockSize)
+    // Round down destLen to a multiple of the blockSize
+    destLen -= (destLen % blockSize); 
+
+  // If allowOverwrite == false then only call to getSize() must run
+  // with interrupts turned off. Otherwise whole function must run
+  // with interrupts turned off.
+  boolean intEn = interruptsEnabled();
+  if (useInterrupts)
+    noInterrupts();
+  int size = getSize(reader); 
+
+  if (useInterrupts && allowOverwrite == false && intEn)
+    interrupts();
+  
+  if (destLen > size)
+    destLen = size;
+
+  // Read up until the end of the buffer
+  int bbw = getBytesBeforeWrap(readPtrs[reader]);
+  int len1 = (destLen < bbw ? destLen : bbw);
+  // ***** memcpy(dest, readPtrs[reader], len1);
+  stream.write(readPtrs[reader], len1);
+  if (len1 == bbw)
+    readPtrs[reader] = buffer; // Must wrap pointer
+  else
+    readPtrs[reader] += len1;
+  
+  // Copy the remainder
+  if (destLen > bbw) {
+    int len2 = destLen - bbw;
+    // ***** memcpy(dest + len1, readPtrs[reader], len2);
+    stream.write(readPtrs[reader], len2);
     readPtrs[reader] += len2;
   }
 

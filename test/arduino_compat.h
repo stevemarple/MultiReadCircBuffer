@@ -29,6 +29,15 @@ inline void noInterrupts(void)
   ;
 }
 
+class Print
+{
+public:
+  inline int write(const uint8_t* buffer, int len) {
+    return 0;
+  };
+};
+
+
 #define SREG 0x80
 
 #endif

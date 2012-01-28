@@ -35,7 +35,8 @@ public:
   // @return number of bytes actually read
   int read(uint8_t* dest, int destLen, uint8_t reader = 0);
   inline int read(void* dest, int destLen, uint8_t reader = 0);
-
+  int read(Print& stream, int destLen, uint8_t reader = 0);
+  
 #ifdef MRCB_DEBUG
   inline void status(const char *file = NULL, int line = 0) const;
 #endif
