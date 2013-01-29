@@ -36,7 +36,11 @@ public:
   int read(uint8_t* dest, int destLen, uint8_t reader = 0);
   inline int read(void* dest, int destLen, uint8_t reader = 0);
   int read(Print& stream, int destLen, uint8_t reader = 0);
-  
+
+  // @return number of bytes copied
+  int peek(uint8_t* dest, int destLen, uint8_t reader = 0);
+  int skip(int len, uint8_t reader = 0);
+
 #ifdef MRCB_DEBUG
   inline void status(const char *file = NULL, int line = 0) const;
 #endif
@@ -65,7 +69,7 @@ private:
 
 inline bool MultiReadCircBuffer::interruptsEnabled(void)
 {
-  return ((SREG & 0x80) >> 7);
+  return (SREG & (1 << SREG_I)) != 0;
 }
 
 inline bool MultiReadCircBuffer::getAllowOverwrite(void) const

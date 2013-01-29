@@ -58,10 +58,14 @@ int MultiReadCircBuffer::write(const uint8_t* src, int srcLen,
 			       bool& overwritten)
 {
   boolean intEn = interruptsEnabled();
-  int len = srcLen;
+  int len = srcLen; // The length to copy
 
   if (blockSize)
     len -= (len % blockSize); // Round down len to a multiple of the blockSize
+
+  // The length to return. Normally the same as the number of bytes
+  // copied, except when len > bufferLen.
+  int rlen = len; 
   
   // Assume overwritten is false (always the case when allowOverwrite
   // is false)
@@ -87,7 +91,7 @@ int MultiReadCircBuffer::write(const uint8_t* src, int srcLen,
     for (int i = 0; i < numReaders; ++i) {
       int n = bufferLen - getSize(i);
       if (n < len)
-	len = n;
+	rlen = len = n;
     }
     if (useInterrupts && intEn)
       interrupts();
@@ -122,7 +126,7 @@ int MultiReadCircBuffer::write(const uint8_t* src, int srcLen,
   // Restore interrupt status
   if (useInterrupts && intEn)
     interrupts();
-  return len;
+  return rlen;
 }
 
 
@@ -219,4 +223,42 @@ int MultiReadCircBuffer::read(Print& stream, int destLen, uint8_t reader)
   if (useInterrupts && intEn)
     interrupts();
   return destLen;
+}
+
+
+int MultiReadCircBuffer::peek(uint8_t* dest, int destLen, uint8_t reader)
+{
+  boolean intEn = interruptsEnabled();
+  if (useInterrupts)
+    noInterrupts();
+  uint8_t* rptr = readPtrs[reader];
+  int size = sizes[reader];
+  int r = read(dest, destLen, reader);
+
+  // Restore read values
+  readPtrs[reader] = rptr;
+  sizes[reader] = size;
+  
+  if (intEn)
+    interrupts();
+  return r;
+}
+
+int MultiReadCircBuffer::skip(int len, uint8_t reader)
+{
+  boolean intEn = interruptsEnabled();
+  if (useInterrupts)
+    noInterrupts();
+
+  if (len > sizes[reader])
+    len = sizes[reader];
+      
+  readPtrs[reader] += len;
+  if (readPtrs[reader] >= getEndOfBuffer())
+    readPtrs[reader] -= bufferLen;
+  sizes[reader] -= len;
+  
+  if (intEn)
+    interrupts();
+  return len;
 }
